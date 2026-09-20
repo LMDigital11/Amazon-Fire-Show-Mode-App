@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="28dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            android:text="Show Mode Settings"
+            android:textColor="#FF237BBA"
+            android:textSize="28sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="4dp"
+            android:paddingBottom="18dp"
+            android:text="Swipe in from the right edge of the photo screen anytime to come back here."
+            android:textColor="#99FFFFFF"
+            android:textSize="14sp" />
+
+        <!-- Photos -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="12dp"
+            android:paddingBottom="4dp"
+            android:text="PHOTOS"
+            android:textColor="#FF237BBA"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="2dp"
+            android:text="Pick individual photos, or a folder — everything in the folder and its subfolders will be shown."
+            android:textColor="#99FFFFFF"
+            android:textSize="13sp" />
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/folderStrip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp" />
+        </HorizontalScrollView>
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/thumbStrip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp" />
+        </HorizontalScrollView>
+
+        <TextView
+            android:id="@+id/photoCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="4dp"
+            android:text="0 photos selected"
+            android:textColor="#99FFFFFF"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="8dp">
+
+            <Button
+                android:id="@+id/btnChoosePhotos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#FF237BBA"
+                android:text="Choose Photos"
+                android:textColor="@android:color/white" />
+
+            <Button
+                android:id="@+id/btnChooseFolder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:backgroundTint="#FF237BBA"
+                android:text="Choose Folder"
+                android:textColor="@android:color/white" />
+
+            <Button
+                android:id="@+id/btnClearPhotos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:backgroundTint="#B8292C3B"
+                android:text="Clear"
+                android:textColor="@android:color/white" />
+        </LinearLayout>
+
+        <!-- Slideshow -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="26dp"
+            android:paddingBottom="4dp"
+            android:text="SLIDESHOW"
+            android:textColor="#FF237BBA"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/labelSpeed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="6dp"
+            android:text="Show each photo for 20 sec"
+            android:textColor="#E6FFFFFF"
+            android:textSize="16sp" />
+
+        <SeekBar
+            android:id="@+id/speedBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="115"
+            android:progress="19" />
+
+        <!-- Weather -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="22dp"
+            android:paddingBottom="4dp"
+            android:text="WEATHER"
+            android:textColor="#FF237BBA"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/cityEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="City name (e.g. London)"
+            android:inputType="textCapWords"
+            android:maxLines="1"
+            android:textColor="@android:color/white"
+            android:textColorHint="#66FFFFFF"
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="4dp"
+            android:text="Weather is fetched free from Open-Meteo and needs internet on the tablet."
+            android:textColor="#6688B0D0"
+            android:textSize="13sp" />
+
+        <RadioGroup
+            android:id="@+id/unitGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="8dp">
+
+            <RadioButton
+                android:id="@+id/unitC"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="Celsius"
+                android:textColor="#E6FFFFFF" />
+
+            <RadioButton
+                android:id="@+id/unitF"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:text="Fahrenheit"
+                android:textColor="#E6FFFFFF" />
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/labelFreq"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp"
+            android:text="Show weather every 4 photos"
+            android:textColor="#E6FFFFFF"
+            android:textSize="16sp" />
+
+        <SeekBar
+            android:id="@+id/freqBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="9"
+            android:progress="3" />
+
+        <TextView
+            android:id="@+id/labelDur"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:text="Weather shown for 10 sec"
+            android:textColor="#E6FFFFFF"
+            android:textSize="16sp" />
+
+        <SeekBar
+            android:id="@+id/durBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="25"
+            android:progress="9" />
+
+        <!-- Screen blank -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="22dp"
+            android:paddingBottom="4dp"
+            android:text="SCREEN"
+            android:textColor="#FF237BBA"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/labelBlank"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="6dp"
+            android:text="Blank screen after 30 min"
+            android:textColor="#E6FFFFFF"
+            android:textSize="16sp" />
+
+        <SeekBar
+            android:id="@+id/blankBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="119"
+            android:progress="29" />
+
+        <Switch
+            android:id="@+id/motionSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:paddingTop="6dp"
+            android:text="Wake when someone is in front of the camera"
+            android:textColor="#E6FFFFFF"
+            android:textSize="16sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="4dp"
+            android:paddingBottom="6dp"
+            android:text="The tablet blanks the screen after the idle time. While blank, it watches through the camera and wakes when movement is seen in the room. Touching the screen also wakes it. The camera is only on while the screen is blank."
+            android:textColor="#6688B0D0"
+            android:textSize="13sp" />
+
+        <!-- Sleep -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="22dp"
+            android:paddingBottom="4dp"
+            android:text="SLEEP"
+            android:textColor="#FF237BBA"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <Switch
+            android:id="@+id/sleepSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="6dp"
+            android:text="Sleep mode (blank screen during set hours)"
+            android:textColor="#E6FFFFFF"
+            android:textSize="16sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="8dp">
+
+            <TextView
+                android:id="@+id/labelSleepStart"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="#33272E3B"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:padding="12dp"
+                android:text="Start 10:00 PM"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/labelSleepEnd"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:background="#33272E3B"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:padding="12dp"
+                android:text="End 7:00 AM"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="4dp"
+            android:paddingBottom="6dp"
+            android:text="During sleep hours the screen stays blank. A tap shows the time for 30 seconds, then it goes dark again. Tap either time to change it."
+            android:textColor="#6688B0D0"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/btnDone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="#FF237BBA"
+            android:text="Done"
+            android:textColor="@android:color/white"
+            android:textSize="18sp" />
+    </LinearLayout>
+</ScrollView>

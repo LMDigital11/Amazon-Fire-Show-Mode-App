@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="show_blue">#FF237BBA</color>
+    <color name="weather_text">#FFFFFFFF</color>
+    <color name="weather_subtext">#B3FFFFFF</color>
+    <color name="weather_faint">#8CFFFFFF</color>
+    <color name="config_bg">#FF0F1B28</color>
+</resources>
