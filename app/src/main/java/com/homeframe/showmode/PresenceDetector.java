@@ -2,6 +2,7 @@ package com.homeframe.showmode;
 
 import android.content.Context;
 import android.graphics.ImageFormat;
+import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.camera2.CameraManager;
 import android.os.Handler;
@@ -28,6 +29,7 @@ public class PresenceDetector {
     private Handler bg;
     private final Handler main = new Handler(Looper.getMainLooper());
     private Camera camera;
+    private SurfaceTexture surfaceTexture;
     private boolean running;
     private byte[] prevLuma;
     private int streak;
@@ -104,6 +106,8 @@ public class PresenceDetector {
             for (int i = 0; i < buffers; i++) {
                 camera.addCallbackBuffer(new byte[bufferSize]);
             }
+            surfaceTexture = new SurfaceTexture(0);
+            camera.setPreviewTexture(surfaceTexture);
             camera.startPreview();
         } catch (Throwable t) {
             Log.w(TAG, "Camera unavailable: " + t.getMessage());
@@ -209,5 +213,12 @@ public class PresenceDetector {
         } catch (Throwable ignored) {
         }
         camera = null;
+        if (surfaceTexture != null) {
+            try {
+                surfaceTexture.release();
+            } catch (Throwable ignored) {
+            }
+            surfaceTexture = null;
+        }
     }
 }

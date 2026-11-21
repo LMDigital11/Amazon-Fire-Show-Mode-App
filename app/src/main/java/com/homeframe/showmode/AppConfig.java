@@ -25,6 +25,7 @@ public final class AppConfig {
     private static final String KEY_SLEEP_ENABLED = "sleep_enabled";
     private static final String KEY_SLEEP_START = "sleep_start";
     private static final String KEY_SLEEP_END = "sleep_end";
+    private static final String KEY_UPDATE_URL = "update_url";
 
     public static final int SPEED_MIN = 5;
     public static final int SPEED_MAX = 120;
@@ -191,6 +192,14 @@ public static long getWeatherTime(Context c) {
 
     public static void setSleepEnd(Context c, int minutes) {
         p(c).edit().putInt(KEY_SLEEP_END, minutes).apply();
+    }
+
+    public static String getUpdateUrl(Context c) {
+        return p(c).getString(KEY_UPDATE_URL, "");
+    }
+
+    public static void setUpdateUrl(Context c, String v) {
+        p(c).edit().putString(KEY_UPDATE_URL, v == null ? "" : v.trim()).apply();
     }
 
     public static boolean isInSleepWindow(Context c) {

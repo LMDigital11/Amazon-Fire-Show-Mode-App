@@ -155,6 +155,13 @@ public class MainActivity extends Activity implements ImageLoader.Callback, Sens
         forecastRow = findViewById(R.id.forecastRow);
         hourlyRow = findViewById(R.id.hourlyRow);
         blankCover = findViewById(R.id.blankCover);
+        blankCover.setClickable(true);
+        blankCover.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (blanked) wakeScreen();
+            }
+        });
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         if (sensorManager != null) {

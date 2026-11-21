@@ -1,11 +1,16 @@
 package com.homeframe.showmode;
 
 import android.app.Activity;
+import android.app.DownloadManager;
 import android.app.TimePickerDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import org.json.JSONObject;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -36,7 +41,7 @@ public class ConfigActivity extends Activity implements ImageLoader.Callback {
     private TextView photoCount, labelSpeed, labelFreq, labelDur, labelBlank;
     private TextView labelSleepStart, labelSleepEnd;
     private SeekBar speedBar, freqBar, durBar, blankBar;
-    private EditText cityEdit;
+    private EditText cityEdit, updateEdit;
     private RadioGroup unitGroup;
     private Switch motionSwitch, sleepSwitch;
 
@@ -67,6 +72,7 @@ public class ConfigActivity extends Activity implements ImageLoader.Callback {
         labelSleepEnd = findViewById(R.id.labelSleepEnd);
         labelBlank = findViewById(R.id.labelBlank);
         cityEdit = findViewById(R.id.cityEdit);
+        updateEdit = findViewById(R.id.updateEdit);
         unitGroup = findViewById(R.id.unitGroup);
 
         Button choose = findViewById(R.id.btnChoosePhotos);
@@ -82,6 +88,7 @@ public class ConfigActivity extends Activity implements ImageLoader.Callback {
         folderUris.addAll(AppConfig.getFolders(this));
 
         cityEdit.setText(AppConfig.getCity(this));
+        updateEdit.setText(AppConfig.getUpdateUrl(this));
         unitGroup.check(AppConfig.isCelsius(this) ? R.id.unitC : R.id.unitF);
 
         speedBar.setProgress(AppConfig.getSpeedSeconds(this) - AppConfig.SPEED_MIN);
@@ -105,6 +112,29 @@ public class ConfigActivity extends Activity implements ImageLoader.Callback {
             @Override
             public void afterTextChanged(Editable s) {
                 AppConfig.setCity(ConfigActivity.this, s.toString());
+            }
+        });
+
+        updateEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int a, int b, int c) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int a, int b, int c) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                AppConfig.setUpdateUrl(ConfigActivity.this, s.toString());
+            }
+        });
+
+        Button checkUpdate = findViewById(R.id.btnCheckUpdate);
+        checkUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkForUpdate();
             }
         });
 
@@ -451,6 +481,104 @@ public class ConfigActivity extends Activity implements ImageLoader.Callback {
         int hh = h % 12;
         if (hh == 0) hh = 12;
         return String.format(java.util.Locale.getDefault(), "%d:%02d%s", hh, m, ampm);
+    }
+
+    private void checkForUpdate() {
+        final String url = AppConfig.getUpdateUrl(this);
+        if (url == null || url.trim().isEmpty()) {
+            Toast.makeText(this, "Set an update URL first", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String json = httpGet(url);
+                    final JSONObject o = new JSONObject(json);
+                    final int remoteCode = o.optInt("versionCode", 0);
+                    final String remoteName = o.optString("versionName", "");
+                    final String apkUrl = o.optString("apkUrl", "");
+                    android.content.pm.PackageInfo pi =
+                            getPackageManager().getPackageInfo(getPackageName(), 0);
+                    final int localCode = pi.versionCode;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (remoteCode > localCode && !apkUrl.isEmpty()) {
+                                Toast.makeText(ConfigActivity.this,
+                                        "New version " + remoteName + " found, downloading...",
+                                        Toast.LENGTH_SHORT).show();
+                                startDownload(apkUrl);
+                            } else if (remoteCode <= localCode) {
+                                Toast.makeText(ConfigActivity.this,
+                                        "Already up to date", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(ConfigActivity.this,
+                                        "Update URL missing apkUrl", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                } catch (final Exception e) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(ConfigActivity.this,
+                                    "Update check failed: " + e.getMessage(),
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+            }
+        }).start();
+    }
+
+    private void startDownload(String apkUrl) {
+        DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+        DownloadManager.Request req = new DownloadManager.Request(Uri.parse(apkUrl));
+        req.setTitle("Show Mode update");
+        req.setDescription("Downloading new version");
+        req.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        req.setDestinationInExternalPublicDir(android.os.Environment.DIRECTORY_DOWNLOADS,
+                "ShowMode-update.apk");
+        final long id = dm.enqueue(req);
+        BroadcastReceiver br = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context c, Intent i) {
+                long done = i.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
+                if (done != id) return;
+                Uri uri = dm.getUriForDownloadedFile(id);
+                Intent install = new Intent(Intent.ACTION_VIEW);
+                install.setDataAndType(uri, "application/vnd.android.package-archive");
+                install.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                install.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                try {
+                    startActivity(install);
+                } catch (Exception ignored) {
+                }
+                try {
+                    unregisterReceiver(this);
+                } catch (Exception ignored) {
+                }
+            }
+        };
+        registerReceiver(br, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+    }
+
+    private String httpGet(String urlStr) throws Exception {
+        java.net.HttpURLConnection c =
+                (java.net.HttpURLConnection) new java.net.URL(urlStr).openConnection();
+        c.setConnectTimeout(15000);
+        c.setReadTimeout(15000);
+        c.setRequestProperty("User-Agent", "ShowMode/1.0");
+        java.io.InputStream in = c.getInputStream();
+        java.io.BufferedReader r =
+                new java.io.BufferedReader(new java.io.InputStreamReader(in, java.nio.charset.StandardCharsets.UTF_8));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = r.readLine()) != null) sb.append(line).append('\n');
+        r.close();
+        c.disconnect();
+        return sb.toString();
     }
 
     private int dp(int value) {
