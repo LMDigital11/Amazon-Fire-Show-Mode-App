@@ -28,18 +28,20 @@ jobs:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         run: |
+          set +e
           if [ -n "$KEYSTORE_BASE64" ]; then
-            echo "$KEYSTORE_BASE64" | base64 -d > release.keystore
-            cat > keystore.properties <<EOF
-            storeFile=release.keystore
-            storePassword=$KEYSTORE_PASSWORD
-            keyAlias=showmode
-            keyPassword=$KEYSTORE_PASSWORD
-            EOF
-            echo "Keystore decoded, release signing enabled"
+            echo "$KEYSTORE_BASE64" | base64 -d > release.keystore 2>/dev/null
+            if [ -s release.keystore ]; then
+              printf 'storeFile=release.keystore\nstorePassword=%s\nkeyAlias=showmode\nkeyPassword=%s\n' "$KEYSTORE_PASSWORD" "$KEYSTORE_PASSWORD" > keystore.properties
+              echo "Keystore decoded, release signing enabled"
+            else
+              echo "Keystore decode failed, building debug"
+              rm -f release.keystore
+            fi
           else
-            echo "No keystore secret found, will build debug APK"
+            echo "No keystore secret, building debug APK"
           fi
+          exit 0
 
       - name: Extract version name
         id: version
