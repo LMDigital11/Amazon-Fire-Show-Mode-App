@@ -194,8 +194,12 @@ public static long getWeatherTime(Context c) {
         p(c).edit().putInt(KEY_SLEEP_END, minutes).apply();
     }
 
+    public static final String DEFAULT_UPDATE_URL =
+            "https://raw.githubusercontent.com/LMDigital11/Amazon-Fire-Show-Mode-App/main/version.json";
+
     public static String getUpdateUrl(Context c) {
-        return p(c).getString(KEY_UPDATE_URL, "");
+        String v = p(c).getString(KEY_UPDATE_URL, "");
+        return v.isEmpty() ? DEFAULT_UPDATE_URL : v;
     }
 
     public static void setUpdateUrl(Context c, String v) {

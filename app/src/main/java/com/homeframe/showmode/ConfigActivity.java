@@ -41,7 +41,7 @@ public class ConfigActivity extends Activity implements ImageLoader.Callback {
     private TextView photoCount, labelSpeed, labelFreq, labelDur, labelBlank;
     private TextView labelSleepStart, labelSleepEnd, labelInstalledVersion;
     private SeekBar speedBar, freqBar, durBar, blankBar;
-    private EditText cityEdit, updateEdit;
+    private EditText cityEdit;
     private RadioGroup unitGroup;
     private Switch motionSwitch, sleepSwitch;
 
@@ -72,7 +72,6 @@ public class ConfigActivity extends Activity implements ImageLoader.Callback {
         labelSleepEnd = findViewById(R.id.labelSleepEnd);
         labelBlank = findViewById(R.id.labelBlank);
         cityEdit = findViewById(R.id.cityEdit);
-        updateEdit = findViewById(R.id.updateEdit);
         labelInstalledVersion = findViewById(R.id.labelInstalledVersion);
         unitGroup = findViewById(R.id.unitGroup);
 
@@ -89,7 +88,6 @@ public class ConfigActivity extends Activity implements ImageLoader.Callback {
         folderUris.addAll(AppConfig.getFolders(this));
 
         cityEdit.setText(AppConfig.getCity(this));
-        updateEdit.setText(AppConfig.getUpdateUrl(this));
         try {
             android.content.pm.PackageInfo pi = getPackageManager().getPackageInfo(getPackageName(), 0);
             String name = pi.versionName == null ? "?" : pi.versionName;
@@ -120,21 +118,6 @@ public class ConfigActivity extends Activity implements ImageLoader.Callback {
             @Override
             public void afterTextChanged(Editable s) {
                 AppConfig.setCity(ConfigActivity.this, s.toString());
-            }
-        });
-
-        updateEdit.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int a, int b, int c) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int a, int b, int c) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                AppConfig.setUpdateUrl(ConfigActivity.this, s.toString());
             }
         });
 
@@ -513,14 +496,21 @@ public class ConfigActivity extends Activity implements ImageLoader.Callback {
                         @Override
                         public void run() {
                             if (remoteCode > localCode && !apkUrl.isEmpty()) {
+                                labelInstalledVersion.setText("Installed: v" + pi.versionName
+                                        + " (" + pi.versionCode + ")  —  New: v" + remoteName
+                                        + " (" + remoteCode + ")");
                                 Toast.makeText(ConfigActivity.this,
                                         "New version " + remoteName + " found, downloading...",
                                         Toast.LENGTH_SHORT).show();
                                 startDownload(apkUrl);
                             } else if (remoteCode <= localCode) {
+                                labelInstalledVersion.setText("Installed: v" + pi.versionName
+                                        + " (" + pi.versionCode + ")  —  Up to date");
                                 Toast.makeText(ConfigActivity.this,
                                         "Already up to date", Toast.LENGTH_SHORT).show();
                             } else {
+                                labelInstalledVersion.setText("Installed: v" + pi.versionName
+                                        + " (" + pi.versionCode + ")");
                                 Toast.makeText(ConfigActivity.this,
                                         "Update URL missing apkUrl", Toast.LENGTH_SHORT).show();
                             }
