@@ -71,6 +71,7 @@ public class MainActivity extends Activity implements ImageLoader.Callback, Sens
     private GestureDetector gesture;
 
     private PresenceDetector presence;
+    private android.os.PowerManager.WakeLock wakeLock;
 
     private final Runnable progress = new Runnable() {
         @Override
@@ -133,6 +134,14 @@ public class MainActivity extends Activity implements ImageLoader.Callback, Sens
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
+
+        android.os.PowerManager pm = (android.os.PowerManager) getSystemService(Context.POWER_SERVICE);
+        if (pm != null) {
+            wakeLock = pm.newWakeLock(android.os.PowerManager.PARTIAL_WAKE_LOCK,
+                    "ShowMode::PresenceWakeLock");
+            wakeLock.setReferenceCounted(false);
+            wakeLock.acquire();
+        }
 
         root = findViewById(R.id.root);
         photoContainer = findViewById(R.id.photoContainer);
@@ -263,6 +272,7 @@ public class MainActivity extends Activity implements ImageLoader.Callback, Sens
         wakeScreen();
         registerListener();
         requestCameraPermissionIfNeeded();
+        requestBatteryOptimizationExemption();
         imageLoader.clear();
         edgeZonePx = dp(90);
         startShow();
@@ -296,6 +306,9 @@ public class MainActivity extends Activity implements ImageLoader.Callback, Sens
     protected void onDestroy() {
         handler.removeCallbacksAndMessages(null);
         if (imageLoader != null) imageLoader.clear();
+        if (wakeLock != null && wakeLock.isHeld()) {
+            wakeLock.release();
+        }
         super.onDestroy();
     }
 
@@ -380,6 +393,19 @@ public class MainActivity extends Activity implements ImageLoader.Callback, Sens
             return;
         }
         requestPermissions(new String[]{android.Manifest.permission.CAMERA}, 200);
+    }
+
+    private void requestBatteryOptimizationExemption() {
+        if (android.os.Build.VERSION.SDK_INT < 23) return;
+        android.os.PowerManager pm = (android.os.PowerManager) getSystemService(Context.POWER_SERVICE);
+        if (pm == null) return;
+        if (pm.isIgnoringBatteryOptimizations(getPackageName())) return;
+        try {
+            Intent i = new Intent(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+            i.setData(android.net.Uri.parse("package:" + getPackageName()));
+            startActivity(i);
+        } catch (Exception ignored) {
+        }
     }
 
     @Override
