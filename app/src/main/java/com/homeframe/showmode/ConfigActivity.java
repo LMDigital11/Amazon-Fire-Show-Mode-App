@@ -39,7 +39,7 @@ public class ConfigActivity extends Activity implements ImageLoader.Callback {
 
     private LinearLayout thumbStrip, folderStrip;
     private TextView photoCount, labelSpeed, labelFreq, labelDur, labelBlank;
-    private TextView labelSleepStart, labelSleepEnd;
+    private TextView labelSleepStart, labelSleepEnd, labelInstalledVersion;
     private SeekBar speedBar, freqBar, durBar, blankBar;
     private EditText cityEdit, updateEdit;
     private RadioGroup unitGroup;
@@ -73,6 +73,7 @@ public class ConfigActivity extends Activity implements ImageLoader.Callback {
         labelBlank = findViewById(R.id.labelBlank);
         cityEdit = findViewById(R.id.cityEdit);
         updateEdit = findViewById(R.id.updateEdit);
+        labelInstalledVersion = findViewById(R.id.labelInstalledVersion);
         unitGroup = findViewById(R.id.unitGroup);
 
         Button choose = findViewById(R.id.btnChoosePhotos);
@@ -89,6 +90,13 @@ public class ConfigActivity extends Activity implements ImageLoader.Callback {
 
         cityEdit.setText(AppConfig.getCity(this));
         updateEdit.setText(AppConfig.getUpdateUrl(this));
+        try {
+            android.content.pm.PackageInfo pi = getPackageManager().getPackageInfo(getPackageName(), 0);
+            String name = pi.versionName == null ? "?" : pi.versionName;
+            labelInstalledVersion.setText("Installed: v" + name + " (" + pi.versionCode + ")");
+        } catch (Exception ignored) {
+            labelInstalledVersion.setText("Installed: unknown");
+        }
         unitGroup.check(AppConfig.isCelsius(this) ? R.id.unitC : R.id.unitF);
 
         speedBar.setProgress(AppConfig.getSpeedSeconds(this) - AppConfig.SPEED_MIN);
